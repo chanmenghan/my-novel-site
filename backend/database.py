@@ -162,7 +162,6 @@ def create_book(user_id, title, style, description=''):
 def update_book(book_id, user_id, title, style, description=None):
     conn = get_db()
     cursor = conn.cursor()
-
     if description is not None:
         cursor.execute(
             'UPDATE books SET title = %s, style = %s, description = %s WHERE id = %s AND user_id = %s',
@@ -194,7 +193,7 @@ def get_book_by_id(book_id, user_id):
     cursor = conn.cursor()
 
     cursor.execute('''
-        SELECT id, title, style, date, description, word_count
+        SELECT id, title, style, date, cover_url, description, word_count
         FROM books WHERE id = %s AND user_id = %s
     ''', (book_id, user_id))
     book = cursor.fetchone()
@@ -240,8 +239,9 @@ def get_book_by_id(book_id, user_id):
         'title': book[1],
         'style': book[2],
         'date': book[3],
-        'description': book[4] or '',
-        'word_count': book[5] or 0,
+        'cover_url': book[4],
+        'description': book[5] or '',
+        'word_count': book[6] or 0,
         'chapters': chapters_list,
         'settings': settings
     }

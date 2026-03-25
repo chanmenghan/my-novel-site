@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from openai import OpenAI
 import jwt
 import datetime
@@ -11,7 +11,7 @@ from database import get_book_by_id, add_chapter, update_chapter, delete_chapter
 from database import update_book_settings, reorder_chapters
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}}, methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers="*")
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
 
@@ -123,12 +123,11 @@ def add_book(current_user):
     data = request.get_json()
     title = data.get('title', '').strip()
     style = data.get('style', '')
-    description = data.get('description', '')
 
     if not title:
         return jsonify({"code": 400, "msg": "作品名称不能为空", "data": None})
 
-    book_id = create_book(current_user['id'], title, style, description)
+    book_id = create_book(current_user['id'], title, style)
     return jsonify({"code": 200, "msg": "添加成功", "data": {"id": book_id}})
 
 @app.put("/api/books/<int:book_id>")
@@ -137,12 +136,11 @@ def modify_book(current_user, book_id):
     data = request.get_json()
     title = data.get('title', '').strip()
     style = data.get('style', '')
-    description = data.get('description')
 
     if not title:
         return jsonify({"code": 400, "msg": "作品名称不能为空", "data": None})
 
-    if update_book(book_id, current_user['id'], title, style, description):
+    if update_book(book_id, current_user['id'], title, style):
         return jsonify({"code": 200, "msg": "更新成功", "data": None})
     else:
         return jsonify({"code": 404, "msg": "作品不存在或无权限", "data": None})

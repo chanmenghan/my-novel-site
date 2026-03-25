@@ -72,7 +72,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const API_URL = '/api/chat'
+const API_URL = 'http://localhost:5000/api/chat'
 
 const inputText = ref('')
 const inspirationType = ref('场景')

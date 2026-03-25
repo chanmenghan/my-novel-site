@@ -78,7 +78,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const API_URL = '/api/chat'
+const API_URL = 'http://localhost:5000/api/chat'
 
 const inputText = ref('')
 const styleSelect = ref('古风武侠')

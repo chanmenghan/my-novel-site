@@ -172,7 +172,7 @@ const fetchBook = async () => {
   if (!bookId || !userStore.token) return
 
   try {
-    const res = await fetch(`/api/books/${bookId}`, {
+    const res = await fetch(`http://localhost:5000/api/books/${bookId}`, {
       headers: { 'Authorization': `Bearer ${userStore.token}` }
     })
     const data = await res.json()
@@ -232,7 +232,7 @@ const handleAddChapter = async () => {
   if (!book.value.id) return
 
   try {
-    const res = await fetch(`/api/books/${book.value.id}/chapters`, {
+    const res = await fetch(`http://localhost:5000/api/books/${book.value.id}/chapters`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -259,7 +259,7 @@ const handleDeleteChapter = async () => {
 
   try {
     const res = await fetch(
-      `/api/books/${book.value.id}/chapters/${currentChapter.value.id}`,
+      `http://localhost:5000/api/books/${book.value.id}/chapters/${currentChapter.value.id}`,
       {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${userStore.token}` }
@@ -304,7 +304,7 @@ const saveCurrent = async () => {
 
   try {
     const res = await fetch(
-      `/api/books/${book.value.id}/chapters/${currentChapter.value.id}`,
+      `http://localhost:5000/api/books/${book.value.id}/chapters/${currentChapter.value.id}`,
       {
         method: 'PUT',
         headers: {
@@ -338,7 +338,7 @@ const saveSettings = async () => {
       inspiration: relatedItems.value.inspiration.content
     }
 
-    const res = await fetch(`/api/books/${book.value.id}/settings`, {
+    const res = await fetch(`http://localhost:5000/api/books/${book.value.id}/settings`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
