@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from openai import OpenAI
 import jwt
 import datetime
@@ -11,7 +11,7 @@ from database import get_book_by_id, add_chapter, update_chapter, delete_chapter
 from database import update_book_settings, reorder_chapters
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, supports_credentials=True)
 
 app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
 

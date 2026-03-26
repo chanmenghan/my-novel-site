@@ -70,13 +70,24 @@
             placeholder="在这里开始您的创作..."
           ></textarea>
         </div>
+        <div class="writing-actions">
+          <button class="save-to-btn" @click="openSaveDialog">💾 保存到</button>
+        </div>
       </div>
     </div>
+
+    <SaveToDialog
+      :visible="showSaveDialog"
+      :content="writingContent"
+      @close="showSaveDialog = false"
+      @saved="onContentSaved"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import SaveToDialog from '../components/SaveToDialog.vue'
 
 const API_URL = 'http://localhost:5000/api/chat'
 
@@ -88,6 +99,7 @@ const writingContent = ref('')
 const isLoading = ref(false)
 const loadingType = ref('')
 const errorMessage = ref('')
+const showSaveDialog = ref(false)
 
 onMounted(() => {
   const saved = localStorage.getItem('writingAreaContent')
@@ -219,6 +231,18 @@ const exportResult = () => {
   URL.revokeObjectURL(url)
   alert('导出成功')
 }
+
+const openSaveDialog = () => {
+  if (!writingContent.value.trim()) {
+    alert('工作台内容为空，请先创作内容')
+    return
+  }
+  showSaveDialog.value = true
+}
+
+const onContentSaved = () => {
+  console.log('内容已保存')
+}
 </script>
 
 <style scoped>
@@ -296,6 +320,50 @@ const exportResult = () => {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+}
+
+.right-panel {
+  position: relative;
+}
+
+.writing-area {
+  position: relative;
+}
+
+.writing-area textarea {
+  width: 100%;
+  min-height: 400px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 1.8;
+  resize: vertical;
+}
+
+.writing-actions {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.save-to-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.save-to-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .word-count-display {
