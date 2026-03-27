@@ -107,7 +107,7 @@
 import { ref, computed, onMounted } from 'vue'
 import SaveToDialog from '../components/SaveToDialog.vue'
 
-const API_URL = 'http://localhost:5000/api/chat'
+const API_URL = '/api/chat'
 
 const activeTab = ref('world')
 const showSaveDialog = ref(false)

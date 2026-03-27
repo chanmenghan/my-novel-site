@@ -89,7 +89,7 @@ const fetchBooks = async () => {
   if (!userStore.token) return
 
   try {
-    const res = await fetch('http://localhost:5000/api/books', {
+    const res = await fetch('/api/api/books', {
       headers: { 'Authorization': `Bearer ${userStore.token}` }
     })
     const data = await res.json()
@@ -109,7 +109,7 @@ const saveBook = async () => {
 
   if (editingBook.value) {
     try {
-      const res = await fetch(`http://localhost:5000/api/books/${editingBook.value.id}`, {
+      const res = await fetch(`/api/books/${editingBook.value.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const saveBook = async () => {
     }
   } else {
     try {
-      const res = await fetch('http://localhost:5000/api/books', {
+      const res = await fetch('/api/books', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ const deleteBook = async (id) => {
   if (!confirm('确定要删除这部作品吗？')) return
 
   try {
-    const res = await fetch(`http://localhost:5000/api/books/${id}`, {
+    const res = await fetch(`/api/books/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${userStore.token}` }
     })

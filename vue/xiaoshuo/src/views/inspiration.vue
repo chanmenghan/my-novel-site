@@ -83,7 +83,7 @@
 import { ref, onMounted } from 'vue'
 import SaveToDialog from '../components/SaveToDialog.vue'
 
-const API_URL = 'http://localhost:5000/api/chat'
+const API_URL = '/api/chat'
 
 const inputText = ref('')
 const inspirationType = ref('场景')

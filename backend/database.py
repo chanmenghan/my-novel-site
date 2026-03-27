@@ -2,13 +2,14 @@ import pymysql
 import bcrypt
 from datetime import datetime
 import json
+import os
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 3306,
-    'user': 'root',
-    'password': '123456',
-    'database': 'xiaoshuo',
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'port': int(os.environ.get('DB_PORT', 3306)),
+    'user': os.environ.get('DB_USER', 'root'),
+    'password': os.environ.get('DB_PASSWORD', '123456'),
+    'database': os.environ.get('DB_NAME', 'xiaoshuo'),
     'charset': 'utf8mb4'
 }
 
@@ -29,18 +30,17 @@ def init_db():
     ''')
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS books (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            user_id INT NOT NULL,
-            title VARCHAR(100) NOT NULL,
-            style VARCHAR(50) NOT NULL,
-            date VARCHAR(20),
-            cover_url VARCHAR(255) DEFAULT NULL,
-            description TEXT DEFAULT NULL,
-            word_count INT DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_user_id (user_id)
-        )
+    CREATE TABLE IF NOT EXISTS books (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    style VARCHAR(50) NOT NULL,
+    date VARCHAR(20),
+    description TEXT DEFAULT NULL,
+    word_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id)
+)
     ''')
 
     cursor.execute('''
@@ -53,7 +53,7 @@ def init_db():
             word_count INT DEFAULT 0,
             sort_order INT DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            updated_at DATETIME,  
             INDEX idx_book_id (book_id),
             INDEX idx_user_id (user_id)
         )
@@ -69,7 +69,7 @@ def init_db():
             character_setting TEXT,
             inspiration TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            updated_at DATETIME,   -- 改为 DATETIME，去掉自动更新
             INDEX idx_book_id (book_id)
         )
     ''')
@@ -193,7 +193,7 @@ def get_book_by_id(book_id, user_id):
     cursor = conn.cursor()
 
     cursor.execute('''
-        SELECT id, title, style, date, cover_url, description, word_count
+        SELECT id, title, style, date, description, word_count
         FROM books WHERE id = %s AND user_id = %s
     ''', (book_id, user_id))
     book = cursor.fetchone()
@@ -239,9 +239,8 @@ def get_book_by_id(book_id, user_id):
         'title': book[1],
         'style': book[2],
         'date': book[3],
-        'cover_url': book[4],
-        'description': book[5] or '',
-        'word_count': book[6] or 0,
+        'description': book[4] or '',
+        'word_count': book[5] or 0,
         'chapters': chapters_list,
         'settings': settings
     }
@@ -277,12 +276,18 @@ def update_chapter(chapter_id, user_id, title=None, content=None):
         return False
 
     book_id = result[0]
+    now = datetime.now()   # 获取当前时间
 
     if title is not None:
-        cursor.execute('UPDATE chapters SET title = %s WHERE id = %s AND user_id = %s', (title, chapter_id, user_id))
+        cursor.execute(
+            'UPDATE chapters SET title = %s, updated_at = %s WHERE id = %s AND user_id = %s',
+            (title, now, chapter_id, user_id)
+        )
     if content is not None:
-        cursor.execute('UPDATE chapters SET content = %s, word_count = %s WHERE id = %s AND user_id = %s',
-                       (content, len(content), chapter_id, user_id))
+        cursor.execute(
+            'UPDATE chapters SET content = %s, word_count = %s, updated_at = %s WHERE id = %s AND user_id = %s',
+            (content, len(content), now, chapter_id, user_id)
+        )
 
     update_book_word_count(book_id, user_id, cursor)
     conn.commit()
@@ -316,16 +321,22 @@ def update_book_word_count(book_id, user_id, cursor):
 def update_book_settings(book_id, user_id, settings):
     conn = get_db()
     cursor = conn.cursor()
+    now = datetime.now()
 
     cursor.execute('''
         UPDATE book_settings
-        SET world_setting = %s, outline = %s, character_setting = %s, inspiration = %s
+        SET world_setting = %s,
+            outline = %s,
+            character_setting = %s,
+            inspiration = %s,
+            updated_at = %s
         WHERE book_id = %s AND user_id = %s
     ''', (
         settings.get('world', ''),
         settings.get('outline', ''),
         settings.get('character', ''),
         settings.get('inspiration', ''),
+        now,
         book_id, user_id
     ))
 

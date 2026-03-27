@@ -98,7 +98,7 @@ const fetchBooks = async () => {
 
   loading.value = true
   try {
-    const res = await fetch('http://localhost:5000/api/books', {
+    const res = await fetch('/api/books', {
       headers: { 'Authorization': `Bearer ${userStore.token}` }
     })
     const data = await res.json()
@@ -117,7 +117,7 @@ const fetchBooks = async () => {
 
 const fetchChapters = async (book) => {
   try {
-    const res = await fetch(`http://localhost:5000/api/books/${book.id}`, {
+    const res = await fetch(`/api/books/${book.id}`, {
       headers: { 'Authorization': `Bearer ${userStore.token}` }
     })
     const data = await res.json()
@@ -165,7 +165,7 @@ const confirmSave = async () => {
       newContent = props.content
     }
 
-    const res = await fetch(`http://localhost:5000/api/books/${selectedChapter.value.bookId}/chapters/${selectedChapter.value.chapterId}`, {
+    const res = await fetch(`/api/books/${selectedChapter.value.bookId}/chapters/${selectedChapter.value.chapterId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

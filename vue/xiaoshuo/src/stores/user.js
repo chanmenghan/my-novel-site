@@ -9,7 +9,7 @@ export const useUserStore = defineStore('user', () => {
 
   const login = async (user, pwd) => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: user, password: pwd })
@@ -32,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
 
   const register = async (user, pwd) => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: user, password: pwd })
@@ -60,7 +60,7 @@ export const useUserStore = defineStore('user', () => {
     if (!token.value) return false
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/me', {
+      const res = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token.value}` }
       })
       const data = await res.json()
