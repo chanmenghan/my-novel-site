@@ -89,7 +89,7 @@ const fetchBooks = async () => {
   if (!userStore.token) return
 
   try {
-    const res = await fetch('/api/api/books', {
+    const res = await fetch('/api/books', {
       headers: { 'Authorization': `Bearer ${userStore.token}` }
     })
     const data = await res.json()
