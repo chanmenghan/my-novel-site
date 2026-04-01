@@ -223,8 +223,8 @@ def get_book_by_id(book_id, user_id):
             'id': c[0],
             'title': c[1] or '',
             'content': c[2] or '',
-            'words': c[3] or 0,
-            'order': c[4]
+            'word_count': c[3] or 0,
+            'sort_order': c[4]
         })
 
     settings = {
@@ -358,6 +358,38 @@ def reorder_chapters(book_id, user_id, chapter_orders):
     conn.commit()
     conn.close()
     return True
+
+def get_user_stats(user_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT created_at FROM users WHERE id = %s', (user_id,))
+    user = cursor.fetchone()
+    if not user:
+        conn.close()
+        return None
+
+    created_at = user[0]
+    if hasattr(created_at, 'timestamp'):
+        days = (datetime.now() - created_at).days + 1
+    else:
+        days = 1
+
+    cursor.execute('SELECT COUNT(*) FROM books WHERE user_id = %s', (user_id,))
+    books_count = cursor.fetchone()[0]
+
+    cursor.execute('''
+        SELECT COALESCE(SUM(word_count), 0)
+        FROM chapters WHERE user_id = %s
+    ''', (user_id,))
+    words_count = cursor.fetchone()[0]
+
+    conn.close()
+    return {
+        'books': books_count,
+        'words': words_count,
+        'days': days
+    }
 
 if __name__ == '__main__':
     init_db()

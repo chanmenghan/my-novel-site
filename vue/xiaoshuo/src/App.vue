@@ -32,11 +32,39 @@
             <div class="dropdown-item" @click="handleLogout">🚪 退出登录</div>
           </div>
         </div>
-        <router-link v-else to="/login" class="user-avatar">👤</router-link>
+        <div v-else class="user-avatar" @click="toggleLoginDialog">👤</div>
       </div>
     </div>
   </nav>
   <router-view />
+
+  <div v-if="showLoginDialog" class="login-overlay" @click.self="closeLoginDialog">
+    <div class="login-dialog">
+      <div class="login-header">
+        <h2>{{ isRegisterMode ? '注册' : '登录' }}</h2>
+        <button class="close-btn" @click="closeLoginDialog">×</button>
+      </div>
+      <div class="login-form">
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" v-model="loginForm.username" placeholder="请输入用户名" />
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" v-model="loginForm.password" placeholder="请输入密码" />
+        </div>
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+        <div class="form-actions">
+          <button class="login-btn" @click="handleLogin">
+            {{ isRegisterMode ? '注册' : '登录' }}
+          </button>
+          <button class="toggle-btn" @click="isRegisterMode = !isRegisterMode">
+            {{ isRegisterMode ? '返回登录' : '没有账号？注册' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -54,7 +82,14 @@ const menuItems = [
   { path: '/shelf', name: '书架', icon: '📚' },
 ]
 
+const showLoginDialog = ref(false)
 const showUserMenu = ref(false)
+const isRegisterMode = ref(false)
+const errorMessage = ref('')
+const loginForm = ref({
+  username: '',
+  password: ''
+})
 
 const isActive = (item) => {
   if (item.path === '/') {
@@ -66,8 +101,45 @@ const isActive = (item) => {
   return route.path.startsWith(item.path)
 }
 
+const toggleLoginDialog = () => {
+  showLoginDialog.value = !showLoginDialog.value
+  isRegisterMode.value = false
+  errorMessage.value = ''
+  loginForm.value = { username: '', password: '' }
+}
+
+const closeLoginDialog = () => {
+  showLoginDialog.value = false
+}
+
 const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
+}
+
+const handleLogin = async () => {
+  if (!loginForm.value.username.trim() || !loginForm.value.password.trim()) {
+    errorMessage.value = '请输入用户名和密码'
+    return
+  }
+
+  errorMessage.value = ''
+
+  if (isRegisterMode.value) {
+    const result = await userStore.register(loginForm.value.username, loginForm.value.password)
+    if (result.success) {
+      alert('注册成功，请登录')
+      isRegisterMode.value = false
+    } else {
+      errorMessage.value = result.message
+    }
+  } else {
+    const result = await userStore.login(loginForm.value.username, loginForm.value.password)
+    if (result.success) {
+      closeLoginDialog()
+    } else {
+      errorMessage.value = result.message
+    }
+  }
 }
 
 const handleLogout = () => {
@@ -265,6 +337,118 @@ body {
 
 .dropdown-item:hover {
   background-color: #f5f5f5;
+}
+
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.login-dialog {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.login-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid #eee;
+}
+
+.login-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.login-form {
+  padding: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #ffebee;
+  border-radius: 6px;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #667eea;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.toggle-btn:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 992px) {

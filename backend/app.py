@@ -8,7 +8,7 @@ from config import DEEPSEEK_BASE_URL, DEEPSEEK_API_KEY, DEFAULT_CHAT_MODEL, SERV
 from database import init_db, create_user, verify_user, get_user_by_id
 from database import get_books_by_user, create_book, update_book, delete_book
 from database import get_book_by_id, add_chapter, update_chapter, delete_chapter
-from database import update_book_settings, reorder_chapters
+from database import update_book_settings, reorder_chapters, get_user_stats
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -105,6 +105,15 @@ def get_me(current_user):
             "username": current_user['username']
         }
     })
+
+@app.get("/api/user/stats")
+@token_required
+def get_stats(current_user):
+    stats = get_user_stats(current_user['id'])
+    if stats:
+        return jsonify({"code": 200, "msg": "成功", "data": stats})
+    else:
+        return jsonify({"code": 404, "msg": "用户不存在", "data": None})
 
 @app.post("/api/auth/logout")
 @token_required
@@ -229,7 +238,7 @@ def get_ai_answer():
         response = deepseek_client.chat.completions.create(
             model=DEFAULT_CHAT_MODEL,
             messages=[
-                {"role": "system", "content": "你是一个友好的AI助手，回答简洁清晰"},
+                {"role": "system", "content": "你是一个擅长写作的AI写作助手，回答简洁清晰并且文笔流畅感情丰沛"},
                 {"role": "user", "content": user_question}
             ],
             stream=False

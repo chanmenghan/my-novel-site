@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 
@@ -104,9 +104,28 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const stats = ref({
-  books: 2,
-  words: 15818,
-  days: 1
+  books: 0,
+  words: 0,
+  days: 0
+})
+
+const fetchStats = async () => {
+  if (!userStore.token) return
+  try {
+    const res = await fetch('/api/user/stats', {
+      headers: { 'Authorization': `Bearer ${userStore.token}` }
+    })
+    const data = await res.json()
+    if (data.code === 200) {
+      stats.value = data.data
+    }
+  } catch (error) {
+    console.error('获取统计失败:', error)
+  }
+}
+
+onMounted(() => {
+  fetchStats()
 })
 
 const goToLogin = () => {

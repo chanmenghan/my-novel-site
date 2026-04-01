@@ -6,126 +6,151 @@
       <button class="save-btn" @click="saveCurrent" :disabled="!isDirty">保存</button>
     </header>
 
-    <section class="book-info">
-      <div class="book-cover">
-        <span class="cover-icon">📖</span>
-      </div>
-      <div class="book-details">
-        <div class="detail-row">
-          <span class="label">作者</span>
-          <span class="value">{{ userStore.username }}</span>
+    <div class="book-content">
+      <section class="book-info">
+        <div class="book-cover">
+          <span class="cover-icon">📖</span>
         </div>
-        <div class="detail-row">
-          <span class="label">标签</span>
-          <span class="value">{{ book.style || '-' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">章节</span>
-          <span class="value">{{ chapters.length }} 章</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">字数</span>
-          <span class="value">{{ book.word_count || 0 }} 字</span>
-        </div>
-      </div>
-    </section>
-
-    <nav class="tab-nav">
-      <div class="tab-item" :class="{ active: activeTab === 'catalog' }" @click="switchTab('catalog')">
-        目录
-      </div>
-      <div class="tab-item" :class="{ active: activeTab === 'related' }" @click="switchTab('related')">
-        相关
-      </div>
-    </nav>
-
-    <main class="book-main">
-      <aside class="sidebar">
-        <template v-if="activeTab === 'catalog'">
-          <div class="sidebar-header">
-            <span>章节目录</span>
-            <button class="add-btn" @click="handleAddChapter">+ 新建</button>
+        <div class="book-details">
+          <div class="detail-row">
+            <span class="label">作者</span>
+            <span class="value">{{ userStore.username }}</span>
           </div>
-          <div class="chapter-list">
-            <div
-              v-for="chapter in chapters"
-              :key="chapter.id"
-              class="chapter-item"
-              :class="{ active: currentChapterId === chapter.id }"
-              @click="selectChapter(chapter)"
-            >
-              <span class="chapter-title">{{ chapter.title || `第${chapter.order + 1}章` }}</span>
-              <span class="chapter-words">{{ chapter.words || 0 }}字</span>
-            </div>
+          <div class="detail-row">
+            <span class="label">标签</span>
+            <span class="value">{{ book.style || '-' }}</span>
           </div>
-        </template>
-
-        <template v-else>
-          <div class="sidebar-header">
-            <span>相关设定</span>
+          <div class="detail-row">
+            <span class="label">章节</span>
+            <span class="value">{{ chapters.length }} 章</span>
           </div>
-          <div class="related-list">
-            <div
-              v-for="(item, key) in relatedItems"
-              :key="key"
-              class="related-item"
-              :class="{ active: currentRelated === key }"
-              @click="selectRelated(key)"
-            >
-              <span>{{ item.label }}</span>
-              <span class="words">{{ item.words }}字</span>
-            </div>
+          <div class="detail-row">
+            <span class="label">字数</span>
+            <span class="value">{{ book.word_count || 0 }} 字</span>
           </div>
-        </template>
-      </aside>
-
-      <section class="editor">
-        <template v-if="activeTab === 'catalog' && currentChapter">
-          <div class="editor-header">
-            <input
-              v-model="currentChapter.title"
-              class="title-input"
-              placeholder="请输入章节标题"
-              @input="markDirty"
-            />
-            <button class="delete-chapter-btn" @click="handleDeleteChapter">删除</button>
-          </div>
-          <textarea
-            v-model="currentChapter.content"
-            class="content-input"
-            placeholder="开始创作..."
-            @input="updateWordCount"
-          ></textarea>
-          <div class="editor-footer">
-            <span class="word-count">本章字数：{{ currentChapter.words || 0 }}</span>
-          </div>
-        </template>
-
-        <template v-else-if="activeTab === 'related'">
-          <div class="editor-header">
-            <input
-              v-model="relatedItems[currentRelated].title"
-              class="title-input"
-              placeholder="请输入标题"
-              @input="markDirtyRelated"
-            />
-          </div>
-          <textarea
-            v-model="relatedItems[currentRelated].content"
-            class="content-input"
-            placeholder="开始创作..."
-            @input="updateRelatedWords"
-          ></textarea>
-          <div class="editor-footer">
-            <span class="word-count">字数：{{ relatedItems[currentRelated].words }}</span>
-          </div>
-        </template>
-
-        <div v-else class="empty-editor">
-          <p>{{ activeTab === 'catalog' ? '请从左侧选择或创建章节' : '请从左侧选择相关设定' }}</p>
         </div>
       </section>
-    </main>
+
+      <nav class="tab-nav">
+        <div class="tab-item" :class="{ active: activeTab === 'catalog' }" @click="switchTab('catalog')">
+          目录
+        </div>
+        <div class="tab-item" :class="{ active: activeTab === 'related' }" @click="switchTab('related')">
+          相关
+        </div>
+      </nav>
+
+      <main class="book-main">
+        <aside class="sidebar">
+          <template v-if="activeTab === 'catalog'">
+            <div class="sidebar-header">
+              <span>章节目录</span>
+              <button class="add-btn" @click="openChapterDialog">+ 新建</button>
+            </div>
+            <div class="chapter-list">
+              <div
+                v-for="chapter in chapters"
+                :key="chapter.id"
+                class="chapter-item"
+                :class="{ active: currentChapterId === chapter.id }"
+                @click="selectChapter(chapter)"
+              >
+                <span class="chapter-title">{{ chapter.title || `第${chapter.sort_order + 1}章` }}</span>
+                <span class="chapter-words">{{ chapter.word_count || 0 }}字</span>
+              </div>
+            </div>
+          </template>
+
+          <template v-else>
+            <div class="sidebar-header">
+              <span>相关设定</span>
+            </div>
+            <div class="related-list">
+              <div
+                v-for="(item, key) in relatedItems"
+                :key="key"
+                class="related-item"
+                :class="{ active: currentRelated === key }"
+                @click="selectRelated(key)"
+              >
+                <span>{{ item.label }}</span>
+                <span class="words">{{ item.word_count }}字</span>
+              </div>
+            </div>
+          </template>
+        </aside>
+
+        <section class="editor">
+          <template v-if="activeTab === 'catalog' && currentChapter">
+            <div class="editor-header">
+              <input
+                v-model="currentChapter.title"
+                class="title-input"
+                placeholder="请输入章节标题"
+                @input="markDirty"
+              />
+              <button class="delete-chapter-btn" @click="handleDeleteChapter">删除</button>
+            </div>
+            <textarea
+              v-model="currentChapter.content"
+              class="content-input"
+              placeholder="开始创作..."
+              @input="updateWordCount"
+            ></textarea>
+            <div class="editor-footer">
+              <span class="word-count">本章字数：{{ currentChapter.word_count || 0 }}</span>
+            </div>
+          </template>
+
+          <template v-else-if="activeTab === 'related'">
+            <div class="editor-header">
+              <input
+                v-model="relatedItems[currentRelated].title"
+                class="title-input"
+                placeholder="请输入标题"
+                @input="markDirtyRelated"
+              />
+            </div>
+            <textarea
+              v-model="relatedItems[currentRelated].content"
+              class="content-input"
+              placeholder="开始创作..."
+              @input="updateRelatedWords"
+            ></textarea>
+            <div class="editor-footer">
+              <span class="word-count">字数：{{ relatedItems[currentRelated].word_count }}</span>
+            </div>
+          </template>
+
+          <div v-else class="empty-editor">
+            <p>{{ activeTab === 'catalog' ? '请从左侧选择或创建章节' : '请从左侧选择相关设定' }}</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div v-if="showChapterDialog" class="dialog-overlay" @click.self="closeChapterDialog">
+    <div class="chapter-dialog">
+      <div class="dialog-header">
+        <h3>新建章节</h3>
+        <button class="dialog-close" @click="closeChapterDialog">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="chapter-prefix">第{{ chapters.length + 1 }}章</div>
+        <input
+          v-model="newChapterName"
+          type="text"
+          class="chapter-input"
+          placeholder="请输入章节名"
+          @keyup.enter="confirmAddChapter"
+        />
+      </div>
+      <div class="dialog-footer">
+        <button class="dialog-btn cancel" @click="closeChapterDialog">取消</button>
+        <button class="dialog-btn confirm" @click="confirmAddChapter">确定</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -145,12 +170,14 @@ const isDirty = ref(false)
 const activeTab = ref('catalog')
 const currentRelated = ref('world')
 const settingsDirty = ref(false)
+const showChapterDialog = ref(false)
+const newChapterName = ref('')
 
 const relatedItems = ref({
-  world: { label: '作品设定', title: '', content: '', words: 0 },
-  outline: { label: '作品大纲', title: '', content: '', words: 0 },
-  character: { label: '角色设定', title: '', content: '', words: 0 },
-  inspiration: { label: '灵感记录', title: '', content: '', words: 0 }
+  world: { label: '作品设定', title: '', content: '', word_count: 0 },
+  outline: { label: '作品大纲', title: '', content: '', word_count: 0 },
+  character: { label: '角色设定', title: '', content: '', word_count: 0 },
+  inspiration: { label: '灵感记录', title: '', content: '', word_count: 0 }
 })
 
 const currentChapter = computed(() => {
@@ -187,13 +214,13 @@ const fetchBook = async () => {
 
       const settings = data.data.settings || {}
       relatedItems.value.world.content = settings.world || ''
-      relatedItems.value.world.words = (settings.world || '').length
+      relatedItems.value.world.word_count = (settings.world || '').length
       relatedItems.value.outline.content = settings.outline || ''
-      relatedItems.value.outline.words = (settings.outline || '').length
+      relatedItems.value.outline.word_count = (settings.outline || '').length
       relatedItems.value.character.content = settings.character || ''
-      relatedItems.value.character.words = (settings.character || '').length
+      relatedItems.value.character.word_count = (settings.character || '').length
       relatedItems.value.inspiration.content = settings.inspiration || ''
-      relatedItems.value.inspiration.words = (settings.inspiration || '').length
+      relatedItems.value.inspiration.word_count = (settings.inspiration || '').length
 
       if (chapters.value.length > 0) {
         selectChapter(chapters.value[0])
@@ -253,6 +280,44 @@ const handleAddChapter = async () => {
   }
 }
 
+const openChapterDialog = () => {
+  newChapterName.value = ''
+  showChapterDialog.value = true
+}
+
+const closeChapterDialog = () => {
+  showChapterDialog.value = false
+  newChapterName.value = ''
+}
+
+const confirmAddChapter = async () => {
+  if (!book.value.id) return
+
+  const chapterTitle = `第${chapters.value.length + 1}章 ${newChapterName.value}`
+
+  try {
+    const res = await fetch(`/api/books/${book.value.id}/chapters`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userStore.token}`
+      },
+      body: JSON.stringify({ title: chapterTitle, content: '' })
+    })
+    const data = await res.json()
+    if (data.code === 200) {
+      await fetchBook()
+      currentChapterId.value = data.data.id
+      isDirty.value = false
+      closeChapterDialog()
+    } else {
+      alert(data.msg)
+    }
+  } catch (error) {
+    alert('添加章节失败')
+  }
+}
+
 const handleDeleteChapter = async () => {
   if (!currentChapter.value) return
   if (!confirm('确定要删除这个章节吗？')) return
@@ -280,7 +345,7 @@ const handleDeleteChapter = async () => {
 const updateWordCount = () => {
   if (currentChapter.value) {
     const content = currentChapter.value.content || ''
-    currentChapter.value.words = content.length
+    currentChapter.value.word_count = content.length
     isDirty.value = true
   }
 }
@@ -295,7 +360,7 @@ const markDirtyRelated = () => {
 
 const updateRelatedWords = () => {
   const content = relatedItems.value[currentRelated.value].content || ''
-  relatedItems.value[currentRelated.value].words = content.length
+  relatedItems.value[currentRelated.value].word_count = content.length
   settingsDirty.value = true
 }
 
@@ -365,7 +430,8 @@ onMounted(() => {
   height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .book-header {
@@ -374,6 +440,16 @@ onMounted(() => {
   padding: 12px 20px;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.book-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .back-btn {
@@ -469,6 +545,9 @@ onMounted(() => {
   display: flex;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 49px;
+  z-index: 10;
 }
 
 .tab-item {
@@ -491,17 +570,23 @@ onMounted(() => {
   flex: 1;
   display: flex;
   overflow: hidden;
+  height: calc(100vh - 60px - 49px - 48px);
 }
 
 .sidebar {
   width: 260px;
+  min-width: 160px;
   background: #fff;
   border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
 }
 
 .sidebar-header {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -526,6 +611,24 @@ onMounted(() => {
 .related-list {
   flex: 1;
   overflow-y: auto;
+  height: calc(100% - 57px);
+}
+
+.editor {
+  flex: 5;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.editor-header {
+  flex-shrink: 0;
+}
+
+.content-input {
+  flex: 1;
 }
 
 .chapter-item,
@@ -567,7 +670,7 @@ onMounted(() => {
 }
 
 .editor {
-  flex: 1;
+  flex: 5;
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -578,6 +681,7 @@ onMounted(() => {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .title-input {
@@ -651,5 +755,178 @@ onMounted(() => {
   border-radius: 8px;
   color: #999;
   font-size: 14px;
+}
+
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.chapter-dialog {
+  background: #fff;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.dialog-close:hover {
+  color: #333;
+}
+
+.dialog-body {
+  padding: 20px;
+}
+
+.chapter-prefix {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.chapter-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.chapter-input:focus {
+  border-color: #667eea;
+}
+
+.dialog-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid #eee;
+  justify-content: flex-end;
+}
+
+.dialog-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+.dialog-btn.cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.dialog-btn.cancel:hover {
+  background: #eee;
+}
+
+.dialog-btn.confirm {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.dialog-btn.confirm:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .book-header {
+    position: relative;
+    top: 0;
+  }
+
+  .book-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    top: 0;
+  }
+
+  .tab-nav {
+    position: relative;
+    top: 0;
+  }
+
+  .book-main {
+    flex-direction: column;
+    height: calc(100vh - 60px - 49px - 48px);
+    min-height: calc(100vh - 60px - 49px - 48px);
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    flex: unset;
+    height: 200px;
+  }
+
+  .chapter-list,
+  .related-list {
+    height: calc(100% - 57px);
+  }
+
+  .editor {
+    flex: 1;
+    padding: 15px;
+    height: calc(100vh - 60px - 49px - 48px - 200px - 57px);
+  }
+
+  .book-details {
+    align-items: center;
+  }
+
+  .detail-row {
+    justify-content: center;
+  }
+
+  .title-input {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+
+  .content-input {
+    padding: 15px;
+    font-size: 14px;
+  }
 }
 </style>
