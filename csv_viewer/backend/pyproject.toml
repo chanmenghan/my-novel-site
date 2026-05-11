@@ -1,0 +1,13 @@
+[project]
+name = "csv-viewer-backend"
+version = "0.1.0"
+description = "CSV 数据查看器后端"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "python-multipart>=0.0.6",
+]
+
+[tool.uv]
+dev-dependencies = []

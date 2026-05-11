@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Hermes Agent · 投资策略自进化报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fc;
+            padding: 24px 16px;
+            color: #1a1f2e;
+            line-height: 1.6;
+        }
+
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -10px rgba(0, 20, 60, 0.12);
+            overflow: hidden;
+            padding: 32px 28px;
+            border: 1px solid #eef2f9;
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            background: linear-gradient(145deg, #0b1e3a 0%, #1f3a6b 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subhead {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e6ebf2;
+            padding-bottom: 18px;
+        }
+
+        .badge {
+            background: #eef6ff;
+            color: #1a5e9c;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid #cddff5;
+        }
+
+        .date {
+            color: #5e6f8b;
+            font-weight: 450;
+        }
+
+        h2 {
+            font-size: 1.7rem;
+            font-weight: 650;
+            margin: 36px 0 16px 0;
+            color: #14273e;
+            border-left: 6px solid #2d6fb0;
+            padding-left: 18px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 28px 0 12px 0;
+            color: #1f3a5f;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: #2a374b;
+        }
+
+        .flowchart-container {
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 24px 20px;
+            margin: 28px 0;
+            border: 1px solid #d9e4f0;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02);
+        }
+
+        .flow-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .flow-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 16px;
+            flex: 1 1 180px;
+            min-width: 160px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+            border: 1px solid #e2ebf6;
+            text-align: center;
+            transition: all 0.1s ease;
+        }
+
+        .flow-card strong {
+            display: block;
+            font-size: 1.1rem;
+            color: #0b2b4f;
+            margin-bottom: 8px;
+        }
+
+        .arrow-symbol {
+            font-size: 2rem;
+            color: #7e9ec0;
+            display: flex;
+            align-items: center;
+        }
+
+        .evolution-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin: 20px 0;
+        }
+
+        .step {
+            background: #f3f8fe;
+            border-radius: 18px;
+            padding: 18px 16px;
+            border-left: 5px solid #2d6fb0;
+        }
+
+        .step .step-num {
+            font-weight: 700;
+            color: #1f4a7a;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 16px;
+            border: 1px solid #dbe2ed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: #1f3a5f;
+            color: white;
+            font-weight: 600;
+            padding: 14px 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e9eef4;
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .prompt-block {
+            background: #0d1f30;
+            color: #e3ecf5;
+            padding: 20px 22px;
+            border-radius: 20px;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 18px 0;
+            border: 1px solid #2a4058;
+        }
+
+        .prompt-block.light {
+            background: #f0f5fb;
+            color: #1a3048;
+            border: 1px solid #b9cee8;
+        }
+
+        .highlight {
+            background: #e7f0fd;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 500;
+            color: #10437c;
+        }
+
+        .note {
+            background: #fef8e7;
+            border-radius: 16px;
+            padding: 18px 22px;
+            border-left: 5px solid #e5a823;
+            margin: 24px 0;
+            color: #3e3a28;
+        }
+
+        .footer-note {
+            margin-top: 32px;
+            text-align: right;
+            font-size: 0.9rem;
+            color: #6f7d94;
+            border-top: 1px dashed #b8c8dd;
+            padding-top: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .report-container { padding: 18px 14px; }
+            h1 { font-size: 1.8rem; }
+            .arrow-symbol { display: none; }
+            .flow-grid { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="report-container">
+    <h1>📈 利用 Hermes Agent 实现投资策略的<br>自动化与自我进化</h1>
+    <div class="subhead">
+        <span class="badge">⚡ 策略智能体 · 自进化飞轮</span>
+        <span class="date">📅 报告日期：2026年4月17日 </span>
+    </div>
+    
+    <p style="font-size:1.05rem; background: #eef3fc; padding: 12px 18px; border-radius: 30px;">
+        <strong>🎯 核心目标：</strong>将成熟的“美股10倍潜力股月度筛选策略”交给 Hermes Agent，实现从<strong>自动化执行 → 市场反馈 → 自我反思 → 策略进化</strong>的完整闭环。
+    </p>
+
+    <!-- 一、背景 -->
+    <h2>一、策略背景</h2>
+    <p>我们现在已经拥有一套经过验证的美股选股策略，比如每月从约5000只美股中筛选具备<strong>未来5-10倍增长潜力</strong>的股票。传统人工执行存在三大痛点：<br>
+    🔹 规则执行繁琐，易遗漏或延迟；<br>
+    🔹 策略参数固化，无法根据市场变化自适应；<br>
+    🔹 复盘依赖人工，难以形成持续迭代的进化能力。</p>
+    <p>借助 <span class="highlight">Hermes Agent 自我进化机制</span>，我们将把策略转化为一个<strong>可自动执行、可自我反思、可持续进化</strong>的智能选股工作流。</p>
+
+    <!-- 二、整体业务流程（视觉化） -->
+    <h2>二、整体业务流程图</h2>
+    <div class="flowchart-container">
+        <p style="font-weight:500; margin-bottom: 12px;">🔄 策略执行 + 进化飞轮（闭环）</p>
+        <div class="flow-grid">
+            <div class="flow-card"><strong>📆 每月定时触发</strong> 自动唤醒 Hermes Agent</div>
+            <span class="arrow-symbol">→</span>
+            <div class="flow-card"><strong>🧠 执行技能</strong> US_10x_Stock_Screener<br>获取美股数据 & 筛选</div>
+            <span class="arrow-symbol">→</span>
+            <div class="flow-card"><strong>📋 生成潜力股名单</strong> 输出结构化报告</div>
+            <span class="arrow-symbol">→</span>
+            <div class="flow-card"><strong>📊 市场真实表现</strong> 次月跟踪涨幅，形成对比表</div>
+            <span class="arrow-symbol">→</span>
+            <div class="flow-card"><strong>🔍 Hermes 复盘反思</strong> 分析胜率 & 失效因子</div>
+            <span class="arrow-symbol">→</span>
+            <div class="flow-card"><strong>🛠️ 自动优化技能</strong> 调用 skill_manage 更新策略</div>
+        </div>
+        <p style="margin-top: 20px; color: #2b4a6e; font-size:0.95rem;">⬆️ 进化后的技能将在下个周期自动生效，形成持续进化的正向循环</p>
+    </div>
+
+    <!-- 三、自我进化机制详解 -->
+    <h2>三、投资策略智能体的自我进化机制</h2>
+    <p><strong>核心思想：</strong>模仿 AlphaZero 的自我博弈——无需人工重写代码，通过<strong>“执行 → 反馈 → 反思 → 更新”</strong>让策略在真实市场数据中自行变异与适应。</p>
+    
+    <div class="evolution-steps">
+        <div class="step"><span class="step-num">❶ 观察</span> Hermes Agent 每月自动执行选股，记录名单与筛选快照。</div>
+        <div class="step"><span class="step-num">❷ 对比</span> 用户/系统将真实涨幅数据整理成对比表，反馈给 Agent。</div>
+        <div class="step"><span class="step-num">❸ 反思</span> Agent 分析成功/失败样本共性，识别失效因子，发现隐藏规律。</div>
+        <div class="step"><span class="step-num">❹ 进化</span> 调用 <code style="background:#d4e2f0; padding:2px 8px; border-radius:20px;">skill_manage(action='patch')</code> 直接更新技能文件。</div>
+    </div>
+
+    <h3>📌 进化示例（模拟）</h3>
+    <p>初始条件：市值＜10亿 · 营收增长＞20% · RSI月线＜40拐头向上。<br>
+    ➕ 经过3个月反馈，Agent 发现“AI基础设施板块”个股涨幅显著更高，且机构持股增幅＞5%时胜率提升。<br>
+    ✅ <strong>自动提议：</strong>增加行业筛选条件 GICS∈['信息技术','通信服务']，并将机构持股变动阈值调整为“增幅＞5%”。经用户确认后，技能自动升级。</p>
+
+    <!-- 对比表格 -->
+    <h2>四、传统模式 vs Hermes 自进化模式</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>维度</th><th>传统人工模式</th><th>⚡ Hermes Agent 自进化模式</th></tr></thead>
+            <tbody>
+                <tr><td>执行效率</td><td>每月手动跑数，耗时数小时</td><td>定时触发，数分钟内完成</td></tr>
+                <tr><td>策略优化</td><td>依赖人工复盘，滞后且主观</td><td>数据驱动，自动分析并提出优化方案</td></tr>
+                <tr><td>知识沉淀</td><td>散落在文档或代码中</td><td>标准化技能文件，版本可追溯</td></tr>
+                <tr><td>进化能力</td><td>需人工重写代码，迭代慢</td><td>反馈闭环实现策略自动迭代与进化</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 关键提示词操作指南 -->
+    <h2>五、关键提示词参考（操作指南）</h2>
+    <h3>📋 第一阶段：教会 Hermes 策略规则</h3>
+    <div class="prompt-block">
+我需要你作为我的量化选股助手。我有一套成熟的选股策略，请仔细学习并记忆。<br><br>
+策略名称：美股10倍潜力股月度筛选策略<br>
+策略逻辑：<br>
+1. 数据源：从美股市场获取约5000只股票的基础数据，包括月线收盘价、市值、营收增长率、机构持股比例、RSI。<br>
+2. 筛选条件：<br>
+    - 市值 &lt; 10亿美元<br>
+    - 过去三年年均营收增长率 &gt; 20%<br>
+    - 月线RSI从 &lt; 40 开始拐头向上<br>
+    - 最近一季度机构持股数量增加<br>
+3. 执行频率：每月第一个交易日。<br>
+4. 最终交付：生成包含股票代码、名称、核心数据及推荐理由的Markdown报告。<br><br>
+请使用 skill_manage 工具将其保存为技能 US_10x_Stock_Screener。
+    </div>
+
+    <h3>🔄 第二阶段：触发策略反思与进化</h3>
+    <div class="prompt-block light">
+这是上个月策略选出的股票清单及本月实际涨幅表现：<br>
+[ 粘贴对比表格，含代码/入选价/当前价/涨幅 ]<br><br>
+请你基于此数据进行策略复盘与自我优化：<br>
+1. 分析表现优异的股票，找出它们的共同隐藏特征。<br>
+2. 分析表现不佳的股票，找出筛选条件的盲区。<br>
+3. 提出至少5条对策略 US_10x_Stock_Screener 的具体优化建议。<br>
+4. 调用 skill_manage(action='patch') 将优化建议更新到技能中。
+    </div>
+
+    <!-- 核心总结 -->
+    <div class="note">
+        <strong>🧩 员工角色（架构师） vs Hermes Agent 角色（执行者，自我学习者）</strong><br>
+        • 我定义初始策略，并提供市场真实反馈数据。<br>
+        • Hermes Agent 自动固化技能、定时执行、复盘分析、主动提出进化方案并更新技能。<br>
+        • 最终形成一套<strong>“用市场数据喂养策略，让策略自行生长”</strong>的智能体系统。
+    </div>
+
+    <h2>六、进化飞轮价值总结</h2>
+    <p>✅ 自动化执行：每月无需人工介入，选股报告直达邮箱/终端。<br>
+    ✅ 自优化迭代：每一次市场反馈都成为策略升级的养料。<br>
+    ✅ 知识沉淀：所有调整记录在技能文件中，形成可追溯的策略进化史。<br>
+    ✅ 领域泛化：本方法论可延伸至风控模型、资产配置等任何需要持续迭代的决策系统。</p>
+
+    <div class="footer-note">
+        Hermes Agent · 自我提升闭环 · 报告生成于 2026-04-17<br>
+        基于 Nous Research Hermes 智能体框架设计
+    </div>
+</div>
+</body>
+</html>

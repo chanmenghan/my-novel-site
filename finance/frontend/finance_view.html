@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 金融投资研究助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .panel-header h2 {
+            font-size: 1.1em;
+            color: #00d4ff;
+        }
+
+        .status {
+            font-size: 0.8em;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
+        }
+
+        .status.error {
+            background: rgba(255,0,0,0.2);
+            color: #ff6b6b;
+        }
+
+        .status.success {
+            background: rgba(0,255,127,0.2);
+            color: #00ff7f;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group select:focus,
+        .input-group textarea:focus {
+            border-color: #00d4ff;
+        }
+
+        .input-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,212,255,0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            margin-top: 15px;
+        }
+
+        .result-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .result-item h3 {
+            font-size: 0.95em;
+            color: #00d4ff;
+            margin-bottom: 8px;
+        }
+
+        .result-item p {
+            font-size: 0.9em;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .result-item ul {
+            margin-left: 20px;
+            color: #ccc;
+        }
+
+        .result-item li {
+            margin-bottom: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .knowledge-base {
+            margin-top: 20px;
+        }
+
+        .kb-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .kb-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kb-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .kb-card:hover {
+            border-color: #7b2ff7;
+            transform: translateY(-2px);
+        }
+
+        .kb-card .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .kb-card .count {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .kb-card .label {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .history-item .time {
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        .history-item .query {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-top: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-container {
+            height: 200px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+            color: #fff;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI 金融投资研究助手</h1>
+            <p>基于 LangGraph + RAG 的美股投资分析 Agent</p>
+        </header>
+
+        <div class="main-content">
+            <div class="left-column">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>💬 研究查询</h2>
+                        <span class="status" id="status">就绪</span>
+                    </div>
+
+                    <div class="tabs">
+                        <div class="tab active" data-type="general">通用问答</div>
+                        <div class="tab" data-type="stock">股票查询</div>
+                        <div class="tab" data-type="research">研报解读</div>
+                        <div class="tab" data-type="knowledge">知识检索</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>输入您的问题</label>
+                        <textarea id="queryInput" placeholder="例如：特斯拉最新季度交付量是多少？请简述达利欧的债务危机模型核心观点。"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" id="submitBtn" onclick="submitQuery()">
+                        提交查询
+                    </button>
+
+                    <div class="result-section" id="resultSection" style="display:none;">
+                        <div class="result-item">
+                            <h3>📊 分析结果</h3>
+                            <div id="resultContent"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel knowledge-base">
+                    <div class="panel-header">
+                        <h2>📚 知识库</h2>
+                    </div>
+                    <div class="kb-grid">
+                        <div class="kb-card">
+                            <div class="icon">📑</div>
+                            <div class="count" id="reportCount">0</div>
+                            <div class="label">研报</div>
+                        </div>
+                        <div class="kb-card">
+                            <div class="icon">📚</div>
+                            <div class="count" id="theoryCount">0</div>
+                            <div class="label">理论</div>
+                        </div>
+                        <div class="kb-card">
+                            <div class="icon">💹</div>
+                            <div class="count" id="stockCount">0</div>
+                            <div class="label">股票</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>🕐 查询历史</h2>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <p style="text-align:center;color:#666;padding:20px;">暂无查询记录</p>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:20px;">
+                    <div class="panel-header">
+                        <h2>📈 市场概览</h2>
+                    </div>
+                    <div class="chart-container">
+                        市场数据展示区域
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:20px;">
+                    <div class="panel-header">
+                        <h2>🔧 快速工具</h2>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <button class="btn" style="background:rgba(0,212,255,0.2);color:#00d4ff;" onclick="quickQuery('苹果最新财务数据')">
+                            苹果财务
+                        </button>
+                        <button class="btn" style="background:rgba(123,47,247,0.2);color:#7b2ff7;" onclick="quickQuery('特斯拉股价分析')">
+                            特斯拉
+                        </button>
+                        <button class="btn" style="background:rgba(0,255,127,0.2);color:#00ff7f;" onclick="quickQuery('什么是DCF估值')">
+                            DCF估值
+                        </button>
+                        <button class="btn" style="background:rgba(255,107,107,0.2);color:#ff6b6b;" onclick="quickQuery('宏观经济学原理')">
+                            宏观原理
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001';
+
+        let currentType = 'general';
+        let queryHistory = [];
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentType = this.dataset.type;
+            });
+        });
+
+        async function submitQuery() {
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) {
+                alert('请输入查询内容');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+            const resultSection = document.getElementById('resultSection');
+
+            btn.disabled = true;
+            status.textContent = '分析中';
+            status.className = 'status';
+            resultSection.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        type: currentType
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('请求失败');
+                }
+
+                const data = await response.json();
+
+                status.textContent = '完成';
+                status.className = 'status success';
+
+                addToHistory(query);
+
+                displayResult(data);
+
+            } catch (error) {
+                console.error('Error:', error);
+                status.textContent = '错误';
+                status.className = 'status error';
+                document.getElementById('resultContent').innerHTML = `
+                    <p style="color:#ff6b6b;">请求失败，请确保后端服务已启动在 ${API_BASE}</p>
+                `;
+            } finally {
+                btn.disabled = false;
+                resultSection.style.display = 'block';
+            }
+        }
+
+        function displayResult(data) {
+            const content = document.getElementById('resultContent');
+
+            if (data.answer) {
+                content.innerHTML = `<p>${data.answer.replace(/\n/g, '<br>')}</p>`;
+            } else if (data.research_report) {
+                const report = data.research_report;
+                content.innerHTML = `
+                    <p><strong>标题：</strong>${report.title || 'N/A'}</p>
+                    <p><strong>评级：</strong>${report.rating || 'N/A'}</p>
+                    <p><strong>目标价：</strong>${report.target_price || 'N/A'}</p>
+                    <p><strong>摘要：</strong>${report.summary_cn || 'N/A'}</p>
+                    ${report.key_points ? `<p><strong>核心观点：</strong></p><ul>${report.key_points.map(p => `<li>${p}</li>`).join('')}</ul>` : ''}
+                `;
+            } else if (data.stock_query) {
+                content.innerHTML = `
+                    <p><strong>股票代码：</strong>${data.stock_query.symbol || 'N/A'}</p>
+                    <p><strong>查询类型：</strong>${data.stock_query.query_type || 'N/A'}</p>
+                `;
+            } else {
+                content.innerHTML = '<p>暂无结果</p>';
+            }
+        }
+
+        function addToHistory(query) {
+            queryHistory.unshift({
+                query: query,
+                time: new Date().toLocaleString()
+            });
+
+            if (queryHistory.length > 10) {
+                queryHistory.pop();
+            }
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+
+            if (queryHistory.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#666;padding:20px;">暂无查询记录</p>';
+                return;
+            }
+
+            list.innerHTML = queryHistory.map(item => `
+                <div class="history-item" onclick="loadHistory('${item.query.replace(/'/g, "\\'")}')">
+                    <div class="time">${item.time}</div>
+                    <div class="query">${item.query}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadHistory(query) {
+            document.getElementById('queryInput').value = query;
+        }
+
+        function quickQuery(query) {
+            document.getElementById('queryInput').value = query;
+            submitQuery();
+        }
+
+        async function loadKnowledgeBaseStats() {
+            try {
+                document.getElementById('reportCount').textContent = '3';
+                document.getElementById('theoryCount').textContent = '5';
+                document.getElementById('stockCount').textContent = '12';
+            } catch (error) {
+                console.error('Failed to load KB stats:', error);
+            }
+        }
+
+        loadKnowledgeBaseStats();
+    </script>
+</body>
+</html>

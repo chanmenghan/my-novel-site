@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>聚水潭API对接需求清单 | 开发演示文稿</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* PPT风格：16:9 背景柔光，干净无干扰 */
+        body {
+            background: #eef2f9;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            line-height: 1.45;
+            color: #102a3c;
+            padding: 40px 20px;
+        }
+
+        /* 幻灯片容器 - 宽屏风格 */
+        .slide {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* HERDER 区域 - 渐变 + 清晰标题 */
+        .hero {
+            background: linear-gradient(110deg, #0b2b3b 0%, #1e5a6f 100%);
+            padding: 48px 48px 40px 48px;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .hero .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .hero .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .hero .pill {
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(2px);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* 主内容 */
+        .content {
+            padding: 40px 48px 52px 48px;
+        }
+
+        /* 网格卡片布局 */
+        .grid-2col {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05), 0 0 0 1px #eceff5;
+            flex: 1;
+            min-width: 260px;
+            transition: transform 0.1s ease;
+        }
+
+        .card-header {
+            padding: 24px 28px 12px 28px;
+            border-bottom: 2px solid #eef2f8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header .icon {
+            font-size: 2rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #144e66;
+            letter-spacing: -0.2px;
+        }
+
+        .card-body {
+            padding: 20px 28px 28px 28px;
+        }
+
+        .full-card {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05), 0 0 0 1px #eceff5;
+            margin-bottom: 32px;
+        }
+
+        .full-card .card-header {
+            padding: 24px 32px 12px 32px;
+        }
+
+        .full-card .card-body {
+            padding: 16px 32px 30px 32px;
+        }
+
+        /* 表格样式 – 优雅现代 */
+        .api-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 8px;
+        }
+
+        .api-table th {
+            text-align: left;
+            font-weight: 600;
+            background: #f5f9ff;
+            padding: 14px 16px;
+            color: #1a5c78;
+            border-bottom: 1.5px solid #e2e9f2;
+        }
+
+        .api-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .required {
+            color: #1f7b4d;
+            font-weight: 600;
+        }
+
+        .optional {
+            color: #b46f21;
+        }
+
+        .mono {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: #f2f5fa;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .highlight-box {
+            background: #f0f7fb;
+            border-left: 6px solid #3085a3;
+            padding: 18px 22px;
+            border-radius: 20px;
+            margin: 20px 0 10px;
+        }
+
+        .script-message {
+            background: #fbfef9;
+            border: 1px solid #cfe3e8;
+            border-radius: 24px;
+            padding: 20px 26px;
+            font-style: normal;
+            font-size: 0.95rem;
+            margin: 12px 0;
+        }
+
+        .two-column-info {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .info-block {
+            flex: 1;
+            background: #fafcff;
+            border-radius: 24px;
+            padding: 18px 20px;
+            border: 1px solid #e2ecf5;
+        }
+
+        hr {
+            margin: 25px 0;
+            border: none;
+            border-top: 2px dotted #cbdae6;
+        }
+
+        .footer-note {
+            background: #eef3fa;
+            border-radius: 26px;
+            padding: 20px 28px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #2a627b;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .hero { padding: 32px 24px; }
+            .content { padding: 28px 24px; }
+            .card-header h3 { font-size: 1.3rem; }
+            .hero h1 { font-size: 2rem; }
+        }
+
+        .small-note {
+            font-size: 0.85rem;
+            color: #3f6f88;
+        }
+    </style>
+</head>
+<body>
+<div class="slide">
+    <!-- 封面区域 -->
+    <div class="hero">
+        <h1>📡 聚水潭 API 对接<br>需求规格与沟通清单</h1>
+        <div class="tagline">
+            <span>🎯 经营核算自动化 · 库存预警 · 运营决策支持</span>
+        </div>
+        <div class="badge-group">
+            <span class="pill">🔑 路径二 · 经理直通授权</span>
+            <span class="pill">⚙️ 订单/商品/库存实时拉取</span>
+            <span class="pill">📊 自动化报表生成</span>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- 1. 沟通模板 (首要信息，用全宽卡片) -->
+        <div class="full-card">
+            <div class="card-header">
+                <div class="icon">📨</div>
+                <h3>📋 直接发送 · 经理沟通模板</h3>
+            </div>
+            <div class="card-body">
+                <div class="script-message">
+                    <p style="font-weight: 700; margin-top: 0;">📌 经理你好，我是技术开发人员。我们需要通过API拉取订单、商品、库存等数据，用于内部自动化报表和库存预警。麻烦你帮忙开通并提供以下信息：</p>
+                    <ul style="margin: 12px 0 8px 20px;">
+                        <li><strong>partnerid（pid）</strong>、<strong>partnerkey（pkey）</strong>、<strong>token</strong> —— 生产环境且三者匹配</li>
+                        <li>开通接口：至少 <code class="mono" style="background:#eef2fa;">orders.query</code> , <code class="mono">items.query</code> , <code class="mono">inventory.query</code></li>
+                        <li>生产环境 API 调用地址</li>
+                        <li>最新 API 文档 + 签名示例代码（任意语言）</li>
+                        <li>我方服务器 IP 白名单配置（若需要）</li>
+                        <li>接口 QPS 上限说明</li>
+                    </ul>
+                    <p style="margin-top: 8px; font-style: italic;">“如果暂不确定接口范围，请先开通订单/商品/库存核心三项，后续可扩展。”</p>
+                </div>
+                <div class="highlight-box">
+                    ✨ <strong>特别提醒</strong>：<code>partnerid / partnerkey / token</code> 必须均为<strong>生产环境</strong>且相互匹配，避免因参数不一致导致签名失败。
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 核心授权三件套 + API地址放在一行两列 -->
+        <div class="grid-2col">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🔐</div>
+                    <h3>授权三件套</h3>
+                </div>
+                <div class="card-body">
+                    <div style="margin-bottom: 12px;"><span class="mono">partnerid / pid</span> — <strong>API账号</strong>（识别合作方）</div>
+                    <div style="margin-bottom: 12px;"><span class="mono">partnerkey / pkey</span> — <strong>签名密钥</strong>（MD5加密核心）</div>
+                    <div><span class="mono">token</span> — <strong>业务门禁卡</strong>（指定店铺/数据范围）</div>
+                    <div class="small-note" style="margin-top: 16px;">⚠️ 旧版认证模式，无需刷新access_token，但三者必须出自同一环境。</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">🌐</div>
+                    <h3>生产地址</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mono" style="background:#eef3fc; display: inline-block; padding: 8px 18px; border-radius: 32px; font-weight:500;">https://open.erp321.com/api/open/query.aspx</div>
+                    <p style="margin-top: 18px;">✅ 请经理最终确认当前有效URL（部分客户地址可能存在差异）</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 接口权限列表表格 + 可选接口 -->
+        <div class="full-card">
+            <div class="card-header">
+                <div class="icon">📋</div>
+                <h3>接口权限需求清单</h3>
+            </div>
+            <div class="card-body">
+                <table class="api-table">
+                    <thead>
+                        <tr><th>接口名称</th><th>业务用途</th><th>优先级</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code class="mono">orders.query</code></td><td>订单列表（销售额、退款、商品销量）</td><td class="required">✅ 必须</td></tr>
+                        <tr><td><code class="mono">items.query</code></td><td>商品资料同步（SKU、属性）</td><td class="required">✅ 必须</td></tr>
+                        <tr><td><code class="mono">inventory.query</code></td><td>实时库存查询（可售/物理库存）</td><td class="required">✅ 必须</td></tr>
+                        <tr><td><code class="mono">aftersales.query</code></td><td>售后/退款单 → 净利润核算</td><td class="optional">⭕ 建议</td></tr>
+                        <tr><td><code class="mono">shops.query</code></td><td>多店铺信息，用于数据路由</td><td class="optional">⭕ 建议</td></tr>
+                        <tr><td><code class="mono">orders.single.query</code></td><td>订单详情（补充字段）</td><td class="optional">⚪ 可选</td></tr>
+                    </tbody>
+                </table>
+                <div class="small-note" style="margin-top: 12px; background:#F8FAFE; padding: 10px 16px; border-radius: 24px;">
+                    💡 若经理不确定明细，请先开通 <strong>前3项必须接口</strong>，后续按需追加。
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 文档 & 频率 & 白名单 (三列自适应网格) -->
+        <div style="display: flex; flex-wrap: wrap; gap: 26px; margin-bottom: 32px;">
+            <div style="flex: 1; background: white; border-radius: 28px; border: 1px solid #edeff5; padding: 0 0 20px 0;">
+                <div style="padding: 20px 24px 0 24px;">
+                    <div style="font-size: 1.8rem; margin-bottom: 8px;">📚</div>
+                    <h3 style="font-size: 1.35rem; margin-bottom: 12px;">文档与示例</h3>
+                    <ul style="margin-left: 18px;">
+                        <li>📄 最新API接口文档（PDF/在线）</li>
+                        <li>🧪 签名生成示例代码（Python/PHP/Java）</li>
+                        <li>🔧 开放平台调试工具（tools.aspx）链接</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="flex: 1; background: white; border-radius: 28px; border: 1px solid #edeff5; padding: 0 0 20px 0;">
+                <div style="padding: 20px 24px 0 24px;">
+                    <div style="font-size: 1.8rem; margin-bottom: 8px;">⏱️</div>
+                    <h3 style="font-size: 1.35rem; margin-bottom: 12px;">频率限制 QPS</h3>
+                    <p>请告知 <code class="mono">orders.query</code>、<code class="mono">inventory.query</code>、<code class="mono">items.query</code> 的每秒请求上限。</p>
+                    <div class="small-note">我们将设计重试+退避策略，保证合规稳定。</div>
+                </div>
+            </div>
+            <div style="flex: 1; background: white; border-radius: 28px; border: 1px solid #edeff5; padding: 0 0 20px 0;">
+                <div style="padding: 20px 24px 0 24px;">
+                    <div style="font-size: 1.8rem; margin-bottom: 8px;">🛡️</div>
+                    <h3 style="font-size: 1.35rem; margin-bottom: 12px;">IP白名单</h3>
+                    <p>服务器出口IP：<code class="mono" style="background:#f1f4f9;">[ 填写您的服务器公网IP ]</code></p>
+                    <p>请经理协助添加白名单，避免调用拦截。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 落地后的开发清单 + 应对话术 -->
+        <div class="full-card">
+            <div class="card-header">
+                <div class="icon">🚀</div>
+                <h3>开发准备就绪 · 快速启动</h3>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+                    <span class="mono" style="background:#e2f0f7;">✅ partnerid/pid</span>
+                    <span class="mono" style="background:#e2f0f7;">🔐 partnerkey/pkey</span>
+                    <span class="mono" style="background:#e2f0f7;">🎫 token</span>
+                    <span class="mono" style="background:#e2f0f7;">🌍 生产URL</span>
+                    <span class="mono" style="background:#e2f0f7;">📄 接口文档</span>
+                </div>
+                <p><strong>拿到上述信息后，可立即完成：</strong></p>
+                <ul style="margin-left: 24px; margin-bottom: 20px;">
+                    <li>编写签名工具，调试订单查询接口 <code class="mono">orders.query</code></li>
+                    <li>每日定时拉取订单、商品、库存数据，存入数据库</li>
+                    <li>构建经营核算报表（销售额/退款/毛利） + 可售天数预警模型</li>
+                    <li>自动化运营日报并关联投放建议（后续集成AI工作流）</li>
+                </ul>
+                <hr>
+                <div style="background: #EFF7F2; border-radius: 24px; padding: 18px 24px;">
+                    💬 <strong>标准应对话术（若经理询问用途）</strong><br>
+                    “我们内部做数据自动化，需要从聚水潭拉取订单、商品、库存做报表和库存预警，不走前端页面，纯API调用。”
+                </div>
+                <div style="margin-top: 20px; font-size: 0.9rem; background: #F6F8FC; border-radius: 24px; padding: 12px 20px;">
+                    🧩 <strong>后续支持</strong>：拿到授权后可提供 Python/Java/PHP 签名范例及增量拉取脚本，加速对接。
+                </div>
+            </div>
+        </div>
+
+        <!-- 总结脚注 -->
+        <div class="footer-note">
+            ⚡ 基于“经理直供参数”模式整理 · 减少往返沟通，加速自动化报表上线<br>
+            📅 建议打印/分享本清单，确保技术需求对齐
+        </div>
+    </div>
+</div>
+</body>
+</html>
